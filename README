@@ -1,7 +1,8 @@
 #### Need create .env file in deric†ory project add litterals API_KEY - key service etherscan.io and PORT 
 ### Start project need enter commands in console:
 *    npm i - install dependency
-*    npm start - start project
+*    npm run build
+*    npm run start - start project
 
 
 ### Detail realization:
