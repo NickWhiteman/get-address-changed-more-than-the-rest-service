@@ -1,29 +1,17 @@
+import { IAddressMoreChange, ResponceAddressMoreChangeService } from "src/types/types";
 import { BlockService } from "../BlockService/BlockService";
-import { LastBlockService } from "../LastBlockService/LastBlockService";
-
-interface IAddressMoreChange {
-    getAddressMoreChange: () => Promise<ResponceAddressMoreChangeService>
-}
-
-type ResponceAddressMoreChangeService = {
-    wallet: string
-    value: string
-}
-
 export class AddressMoreChangeService implements IAddressMoreChange {
 
-    private _lastBlockService: LastBlockService;
     private _blockService: BlockService;
 
     constructor() {
-        this._lastBlockService = new LastBlockService();
         this._blockService = new BlockService();
     };
 
     async getAddressMoreChange(): Promise<ResponceAddressMoreChangeService> {
         const walletList: {[key: string]: string} = {};
         
-        const lastBlock = (await this._lastBlockService.getLastBlock()).result;
+        const lastBlock = (await this._blockService.getLastBlock()).result;
         
         const endItteration = +this._convertNumber(lastBlock);
         let startItteration = endItteration - 100;
@@ -47,16 +35,13 @@ export class AddressMoreChangeService implements IAddressMoreChange {
 
         for (let wallet in walletList) {
             if ( walletList[wallet] === sortResultValue[0] ) {
-                return new Promise((resolve, reject) => {
-                    resolve({
+                return {
                         wallet: wallet, 
                         value: walletList[wallet]
-                    } as ResponceAddressMoreChangeService)
-                });
-            }
+                    } as ResponceAddressMoreChangeService;
+            };
         }
     }
-    
 
     private _convertNumber(hexNumber: string | number, deegree: number = 16): number | string {
         if (typeof hexNumber === 'number') {
