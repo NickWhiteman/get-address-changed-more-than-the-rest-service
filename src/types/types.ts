@@ -40,36 +40,34 @@ export type Transactions = {
     s: string
 };
 
+type ResultBlockType = {
+    baseFeePerGas: string
+    difficulty: string
+    extraData: string
+    gasLimit: string
+    gasUsed: string
+    hash: string
+    logsBloom: string
+    miner: string
+    mixHash: string
+    nonce: string
+    number: string
+    parentHash: string
+    receiptsRoot: string
+    sha3Uncles: string
+    size: string
+    stateRoot: string
+    timestamp: string
+    totalDifficulty: string
+    transactions: Transactions[]
+    transactionsRoot: string
+    uncles: string[]
+};
+
 export type BlockType = {
     jsonrpc: string
     id: number
-    result: {
-        baseFeePerGas: string
-        difficulty: string
-        extraData: string
-        gasLimit: string
-        gasUsed: string
-        hash: string
-        logsBloom: string
-        miner: string
-        mixHash: string
-        nonce: string
-        number: string
-        parentHash: string
-        receiptsRoot: string
-        sha3Uncles: string
-        size: string
-        stateRoot: string
-        timestamp: string
-        totalDifficulty: string
-        transactions: Transactions[]
-        transactionsRoot: string
-        uncles: string[]
-    };
+    result: ResultBlockType
 };
 
-export type PartiesTransactionsType = {
-    from: string
-    to: string
-    value: string
-}
+export type PartiesTransactionsType = Pick<Transactions, 'from' | 'to' | 'value'>
