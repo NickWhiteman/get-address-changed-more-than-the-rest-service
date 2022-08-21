@@ -1,21 +1,18 @@
-import express from 'express'
-import { env } from 'process';
-import dotenv from 'dotenv'
-import bodyParser from 'body-parser'
+import dotenv from "dotenv";
+import express from "express";
+import { env } from "process";
 
-import { AddressMoreChangeService } from './services/AddressMoreChangeService/AddressMoreChangeService';
+import { AddressMoreChangeService } from "./services/AddressMoreChangeService/AddressMoreChangeService";
 
 dotenv.config();
 const port = env.PORT;
 const app = express();
 
-app.use(bodyParser.json());
-
-
-app.get('/', async (req, res) => {
-  const address = new AddressMoreChangeService();
-  const {wallet, value} = await address.getAddressMoreChange();
-  res.send(`solution : { wallet: ${wallet} value: ${value} }`);
-})
+app.get("/", async (req, res) => {
+	const address = new AddressMoreChangeService();
+	const wallet = await address.getAddressMoreChange();
+	  
+	res.send(wallet);
+});
 
 app.listen(port, () => console.log(`Running on port ${port}`));

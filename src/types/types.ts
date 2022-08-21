@@ -1,6 +1,7 @@
 export interface IBlockService {
-    getLastBlock: () => Promise<LastBlockType>;
-    getBlockById: (id: string) => Promise<BlockType>;
+    getMoreBlockByIds: (ids: string[]) => Promise<BlockType[]>
+    getLastBlock: () => Promise<LastBlockType>
+    getBlockById: (id: string) => Promise<BlockType>
 }
 
 export interface IAddressMoreChange {
@@ -8,17 +9,14 @@ export interface IAddressMoreChange {
 }
 
 export type LastBlockType = {
-	jsonrpc: string;
-	id: number;
-	result: string;
+	jsonrpc: string
+	id: number
+	result: string
 };
-
 
 export type ResponceAddressMoreChangeService = {
     wallet: string
-    value: string
 }
-
 
 export type Transactions = {
     blockHash: string
@@ -35,7 +33,7 @@ export type Transactions = {
     nonce: string
     transactionIndex: string
     type: string
-    accessList: [],
+    accessList: []
     chainId: string
     v: string
     r: string
@@ -43,29 +41,35 @@ export type Transactions = {
 };
 
 export type BlockType = {
-    jsonrpc: string;
-    id: number;
+    jsonrpc: string
+    id: number
     result: {
-        baseFeePerGas: string;
-        difficulty: string;
-        extraData: string;
-        gasLimit: string;
-        gasUsed: string;
-        hash: string;
-        logsBloom: string;
-        miner: string;
-        mixHash: string;
-        nonce: string;
-        number: string;
-        parentHash: string;
-        receiptsRoot: string;
-        sha3Uncles: string;
-        size: string;
-        stateRoot: string;
-        timestamp: string;
-        totalDifficulty: string;
-        transactions: Transactions[];
-        transactionsRoot: string;
-        uncles: string[];
+        baseFeePerGas: string
+        difficulty: string
+        extraData: string
+        gasLimit: string
+        gasUsed: string
+        hash: string
+        logsBloom: string
+        miner: string
+        mixHash: string
+        nonce: string
+        number: string
+        parentHash: string
+        receiptsRoot: string
+        sha3Uncles: string
+        size: string
+        stateRoot: string
+        timestamp: string
+        totalDifficulty: string
+        transactions: Transactions[]
+        transactionsRoot: string
+        uncles: string[]
     };
 };
+
+export type PartiesTransactionsType = {
+    from: string
+    to: string
+    value: string
+}

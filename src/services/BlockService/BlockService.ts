@@ -1,38 +1,35 @@
-import request from "request";
+import axios from "axios";
 import { env } from 'process';
+
 import { 
     BlockType, 
     IBlockService, 
-    LastBlockType 
+    LastBlockType, 
 } from "src/types/types";
 
 export class BlockService implements IBlockService {
-
     async getBlockById(id: string): Promise<BlockType> {
-        let result: BlockType;
-        request(
-            `https://api.etherscan.io/api?module=proxy&action=eth_getBlockByNumber&tag=${id}&boolean=true&apikey=${env.API_KEY}`,
-            (err, response) => {
-                if (err) console.log({ message: err });
+        return await this._getRequest(
+            `https://api.etherscan.io/api?module=proxy&action=eth_getBlockByNumber&tag=${id}&boolean=true&apikey=${env.API_KEY}`
+        ) as BlockType;
+    }
 
-                result = {...JSON.parse(response.body)};
-            }
-        );
-        
-        return result;
+    async getMoreBlockByIds(ids: string[]): Promise<BlockType[]> {
+        const createRequestsList = () => 
+            ids.map(async id => (await this.getBlockById(id)));
+                
+        return await Promise.all(createRequestsList());
     }
 
     async getLastBlock(): Promise<LastBlockType> {
-		let result: LastBlockType;
-      	request(
-			`https://api.etherscan.io/api?module=proxy&action=eth_blockNumber&apikey=${env.API_KEY}`,
-			(err, response) => {
-				if (err) console.log({ message: err });
+        return await this._getRequest(
+            `https://api.etherscan.io/api?module=proxy&action=eth_blockNumber&apikey=${env.API_KEY}`
+        ) as LastBlockType;
+    }
 
-				result = {...JSON.parse(response.body)};
-			}
-		);
-
-		return result;
+    private async _getRequest(url: string): Promise<LastBlockType | BlockType> {
+            return await axios.get<LastBlockType | BlockType>(url)
+                .then(data => data.data)
+                .catch(err => err );
     }
 }
