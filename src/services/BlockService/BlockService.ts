@@ -1,3 +1,4 @@
+import PromisePool from "@supercharge/promise-pool/dist";
 import axios from "axios";
 import { env } from 'process';
 
@@ -22,13 +23,16 @@ export class BlockService implements IBlockService {
     /**
      * @description method getMoreBlockByIds create list async function
      * for init array for method Promis.all()
-     * @param {strimg[]} ids for mapping multiple queries 
+     * @param {strimg[]} ids array for multiple queries 
      * @returns {Promise<BlockType[]>} promise of type BlockType[]
      */
     async getMoreBlockByIds(ids: string[]): Promise<BlockType[]> {
-        const createRequestsList = ids.map((id) => async () => (await this.getBlockById(id)));
-                
-        return await Promise.all([...createRequestsList.map(item => item())]);
+        const { results, errors } = await PromisePool
+            .for(ids)
+            .withConcurrency(ids.length)
+            .process((id) => this.getBlockById(id))
+
+        return results;
     }
 
     /**
@@ -47,8 +51,8 @@ export class BlockService implements IBlockService {
      * @returns {Promise<LastBlockType | BlockType>} Promise<LastBlockType | BlockType>
      */
     private async _getRequest(url: string): Promise<LastBlockType | BlockType> {
-            return await axios.get<LastBlockType | BlockType>(url)
-                .then(data => data.data)
-                .catch(err => err );
+        return await axios.get<LastBlockType | BlockType>(url)
+            .then(data => data.data)
+            .catch(err => err );
     }
 }

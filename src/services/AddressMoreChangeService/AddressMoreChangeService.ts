@@ -25,7 +25,7 @@ export class AddressMoreChangeService implements IAddressMoreChange {
         }
 
         const resultMultipleQueries = await this._blockService.getMoreBlockByIds(ids);
-        resultWallet = this._walletSearchLogic(resultMultipleQueries);
+        resultWallet = this._walletFindingLogic(resultMultipleQueries);
 
         return resultWallet;
     }
@@ -34,33 +34,31 @@ export class AddressMoreChangeService implements IAddressMoreChange {
      * @description method of finding the true wallet with the largest amount
      * @param {BlockType[]} results array blocks for maping list wallets and finding amount
      */
-    private _walletSearchLogic(results: BlockType[]) {
+    private _walletFindingLogic(results: BlockType[]) {
         let resultWallet: ResponceAddressMoreChangeService;
         const walletList: {[key: string]: number} = {};
         const transactions: Transactions[] = [];
         const partiesTransactions: PartiesTransactionsType[] = [];
 
-        results.forEach((block: BlockType) => {
+        results.map((block: BlockType) => {
             transactions.push(...block.result.transactions)
         });
 
-        // so fast working endpoint
-        transactions.forEach((transaction: Transactions, index) => {
+        transactions.map((transaction: Transactions) => {
             partiesTransactions.push({
-                from: transactions[index].from,
-                to: transactions[index].to,
-                value: transactions[index].value
-            });
+                from: transaction.from,
+                to: transaction.to,
+                value: transaction.value
+            } as PartiesTransactionsType);
         });
 
-        // i don't know how to do better 60-62
-        partiesTransactions.forEach((parties, index) => {
+        partiesTransactions.map((parties, index) => {
             Object.keys({
                 from: parties.from, 
                 to: parties.to}).some((key) => {
-                    walletList[partiesTransactions[index][key]] = key === 'from'
-                        ? -this._convertNumber(partiesTransactions[index].value)
-                        : +this._convertNumber(partiesTransactions[index].value)
+                    walletList[
+                        partiesTransactions[index][key] //key new wallet 
+                    ] = this._behaviorValueForWalletList(parties[key])[key]
                 });
         });
 
@@ -79,14 +77,25 @@ export class AddressMoreChangeService implements IAddressMoreChange {
     
     /**
      * @description method converting of the calculus system
-     * @param {number} hexNumber type Number @return {string} returning type String = '0x012abc' and behavior @
-     * @param {string} hexNumber type String @return {number} returning type Number = 10
+     * @param {number} hexNumber type Number @return {string} returning type String and behavior @
+     * @param {string} hexNumber type String @return {number} returning type Number
      * @param {number} deegree parameter of the calculus system. Default deegree = 16
      */
     private _convertNumber(hexNumber: string | number, deegree: number = 16): number | string {
-        if (typeof hexNumber === 'number') {
+        if ( typeof hexNumber === 'number' ) {
             return `0x${hexNumber.toString(deegree)}`;
         }
         return parseInt(hexNumber, deegree);
+    }
+    /**
+     * @description Bike for operation with amounts
+     * @param {string} transactionsValue converting value for walletList
+     * @returns 
+     */
+    private _behaviorValueForWalletList(transactionsValue: string) {
+        return {
+            from: -this._convertNumber(transactionsValue),
+            to: +this._convertNumber(transactionsValue)
+        } as {from: number, to: number}
     }
 }
