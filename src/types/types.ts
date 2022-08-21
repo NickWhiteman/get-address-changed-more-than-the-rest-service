@@ -70,4 +70,4 @@ export type BlockType = {
     result: ResultBlockType
 };
 
-export type PartiesTransactionsType = Pick<Transactions, 'from' | 'to' | 'value'>
+export type PartiesTransactionsType = Pick<Transactions, 'from' | 'to' | 'value'>;
