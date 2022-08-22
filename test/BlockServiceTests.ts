@@ -12,7 +12,7 @@ describe("BlockServiceTests", () => {
 
 	it("should method BlockService.getBlockById", async () => {
 		const { result }: Pick<LastBlockType, "result"> =
-		await block.getLastBlock();
+			await block.getLastBlock();
 
 		const resultTesting = await block.getBlockById(result);
 
@@ -21,19 +21,26 @@ describe("BlockServiceTests", () => {
 
 	it("should method BlockService.getLastBlock", async () => {
 		const { result }: Pick<LastBlockType, "result"> =
-		await block.getLastBlock();
+			await block.getLastBlock();
 
-		const resultTesting = await block.getLastBlock();
-
-		expect(result).to.equals(resultTesting);
+		expect('string').to.equals(typeof result);
 	});
 
-	it("should method BlockService.getLastBlock", async () => {
-		const { result }: Pick<LastBlockType, "result"> =
-		await block.getLastBlock();
+	it("should method BlockService.getMoreBlockByIds", async () => {
+		const ids: string[] = []
+		const {result} = await block.getLastBlock();
+		const startItteration = +parseInt(result, 16);
 
-		const resultTesting = await block.getLastBlock();
 
-		expect(result).to.equals(resultTesting);
+        for (let i = startItteration; i >= startItteration - 10; i--) {
+            const hexStartItteration = `0x${i.toString(16)}`;
+
+            ids.push(hexStartItteration);
+		}
+		
+
+		const testingMethod = await block.getMoreBlockByIds(ids);
+
+		expect(ids.length).to.equals(testingMethod.length);
 	});
 });

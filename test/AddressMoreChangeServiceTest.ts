@@ -1,6 +1,7 @@
 import { expect } from "chai";
 
 import { AddressMoreChangeService } from "src/services/AddressMoreChangeService/AddressMoreChangeService";
+import { ResponceAddressMoreChangeService } from "src/types/types";
 
 describe('AddressMoreChangeServiceTest', () => {
     let addressMoreChangeService: AddressMoreChangeService;
@@ -9,8 +10,8 @@ describe('AddressMoreChangeServiceTest', () => {
         addressMoreChangeService = new AddressMoreChangeService;
     })
 
-    it('should method AddressMoreChangeServiceTest.getAddressMoreChange', async () => {
-        const { wallet } = await addressMoreChangeService.getAddressMoreChange();
+    it('should method AddressMoreChangeService.getAddressMoreChange', async () => {
+        const { wallet }: Pick<ResponceAddressMoreChangeService, 'wallet'> = await addressMoreChangeService.getAddressMoreChange();
 
         expect('string').to.equals(typeof wallet);
     })
