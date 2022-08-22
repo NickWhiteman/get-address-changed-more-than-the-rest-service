@@ -6,6 +6,5 @@
 
 
 ### Detail realization:
-*   LastBlockService - the entity implements a request interface to the etherscan endpoint to get the last block of the chain. 
 *   BlockService - implements the behavior of the GET request to get a block by number. 
 *   AddressMoreChangeService - implements task logic.

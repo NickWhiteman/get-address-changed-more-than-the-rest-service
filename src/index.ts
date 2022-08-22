@@ -9,7 +9,7 @@ const port = env.PORT;
 const app = express();
 
 app.get("/", async (req, res) => {
-	const address = new AddressMoreChangeService();
+	const address = new AddressMoreChangeService;
 	const wallet = await address.getAddressMoreChange();
 	  
 	res.send(wallet);

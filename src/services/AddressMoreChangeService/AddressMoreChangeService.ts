@@ -7,7 +7,7 @@ export class AddressMoreChangeService implements IAddressMoreChange {
     private _blockService: BlockService;
 
     constructor() {
-        this._blockService = new BlockService();
+        this._blockService = new BlockService;
     };
 
     async getAddressMoreChange(): Promise<ResponceAddressMoreChangeService> {
