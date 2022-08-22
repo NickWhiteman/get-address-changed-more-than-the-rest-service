@@ -14,9 +14,7 @@ export class AddressMoreChangeService implements IAddressMoreChange {
     async getAddressMoreChange(): Promise<ResponceAddressMoreChangeService> {
         let resultWallet: ResponceAddressMoreChangeService;
         const ids: string[] = [];
-        
         const lastBlock = (await this._blockService.getLastBlock()).result;        
-        
         const startItteration = +this._convertNumber(lastBlock);
 
         for (let i = startItteration; i >= startItteration - 100; i--) {
