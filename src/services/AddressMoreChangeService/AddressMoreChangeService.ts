@@ -39,7 +39,7 @@ export class AddressMoreChangeService implements IAddressMoreChange {
         const transactions: Transactions[] = [];
         const partiesTransactions: PartiesTransactionsType[] = [];
 
-        results.map((block: BlockType, index) => {
+        results.map((block: BlockType) => {
             transactions.push(...block.result.transactions
                 .map((transaction: Transactions) => transaction))
         });
