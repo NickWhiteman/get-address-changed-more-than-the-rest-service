@@ -3,6 +3,7 @@ import {
     ResponceAddressMoreChangeService, Transactions 
 } from "src/types/types";
 import { BlockService } from "../BlockService/BlockService";
+
 export class AddressMoreChangeService implements IAddressMoreChange {
     private _blockService: BlockService;
 
@@ -56,13 +57,13 @@ export class AddressMoreChangeService implements IAddressMoreChange {
             Object.keys({
                 from: parties.from, 
                 to: parties.to}).some((key) => {
-                    walletList[
-                        partiesTransactions[index][key] //key new wallet 
-                    ] = this._behaviorValueForWalletList(parties[key])[key]
+                    const indexWalletList = partiesTransactions[index][key] //key wallet 
+
+                    walletList[indexWalletList] += this._behaviorValueForWalletList(parties['value'])[key]
                 });
         });
 
-        if ( walletList ) {
+        if ( Object.keys(walletList).length ) {
             const sortResultValue = Object.values(walletList).sort((a: number, b: number) => b - a);
 
             for (let wallet in walletList) {
@@ -94,7 +95,7 @@ export class AddressMoreChangeService implements IAddressMoreChange {
      */
     private _behaviorValueForWalletList(transactionsValue: string) {
         return {
-            from: -this._convertNumber(transactionsValue),
+            from: -(+this._convertNumber(transactionsValue)),
             to: +this._convertNumber(transactionsValue)
         } as {from: number, to: number}
     }
