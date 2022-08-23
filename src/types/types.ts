@@ -71,3 +71,7 @@ export type BlockType = {
 };
 
 export type PartiesTransactionsType = Pick<Transactions, 'from' | 'to' | 'value'>;
+
+export type WalletListType = {
+    [key: string]: number
+}

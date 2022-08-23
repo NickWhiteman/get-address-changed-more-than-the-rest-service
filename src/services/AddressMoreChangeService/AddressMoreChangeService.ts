@@ -1,6 +1,6 @@
 import { 
     BlockType, IAddressMoreChange, PartiesTransactionsType, 
-    ResponceAddressMoreChangeService, Transactions 
+    ResponceAddressMoreChangeService, Transactions, WalletListType 
 } from "src/types/types";
 import { BlockService } from "../BlockService/BlockService";
 
@@ -35,41 +35,66 @@ export class AddressMoreChangeService implements IAddressMoreChange {
      */
     private _walletFindingLogic(results: BlockType[]) {
         let resultWallet: ResponceAddressMoreChangeService;
-        const walletList: {[key: string]: number} = {};
-        const partiesTransactions: PartiesTransactionsType[] = [];
-
-        results.map(({result}: BlockType) => {
-            result.transactions.map((transaction: Transactions) => { 
-                partiesTransactions.push({
-                    from: transaction.from,
-                    to: transaction.to,
-                    value: transaction.value
-                } as PartiesTransactionsType); 
-            })
+        let partiesTransactions: PartiesTransactionsType[];
+        
+        results.forEach(({result}: BlockType) => {
+            const { transactions } = result;
+            partiesTransactions = this._transactionMapper(transactions);
         });
+        
+        const walletList: WalletListType = this._walletListMapper(partiesTransactions);
 
-        partiesTransactions.map((parties) => {
-            Object.keys({
-                from: parties.from, 
-                to: parties.to}).some((key) => {
-                    const indexWalletList = parties[key] //key wallet 
-
-                    walletList[indexWalletList] += this._behaviorValueForWalletList(parties['value'])[key]
-                });
-        });
-
-        if ( Object.keys(walletList).length ) {
-            const sortResultValue = Object.values(walletList).sort((a: number, b: number) => b - a);
-
-            for (let wallet in walletList) {
-                if ( walletList[wallet] === sortResultValue[0] ) {
-                    resultWallet = { wallet };
-                };
-            }
+        if ( walletList ) {
+            resultWallet = this._findingWallet(walletList);
         }
 
         return resultWallet;
     }
+
+    private _walletListMapper(partiesTransactions: PartiesTransactionsType[]) {
+        const walletList: WalletListType = {};
+
+        const walletListFiller = (parties: PartiesTransactionsType) => {
+            ['from', 'to'].forEach((key) => {
+                const indexWalletList = parties[key]; 
+
+                walletList[indexWalletList] += this._behaviorValueForWalletList(parties['value'])[key]
+            })
+        };
+
+        partiesTransactions.forEach((parties) => {
+            walletListFiller(parties);
+        });
+
+        return walletList;
+    }
+
+    private _findingWallet(walletList: WalletListType): ResponceAddressMoreChangeService {
+        const walletKey = Object.keys(walletList);
+        const sortResultValue = Object.values(walletList).sort((a: number, b: number) => b - a);
+
+        const wallet = walletKey.find((wallet) => {
+            walletList[wallet] === sortResultValue[0]
+        });
+
+        return { wallet };
+    }
+
+    private _transactionMapper(transactions: Transactions[]): PartiesTransactionsType[] {
+        const partiesTransactions: PartiesTransactionsType[] = [];
+
+        transactions.forEach(transaction => 
+            partiesTransactions.push({
+                from: transaction.from,
+                to: transaction.to,
+                value: transaction.value
+            })
+        )
+        
+        return partiesTransactions;
+    }
+        
+
     
     /**
      * @description method converting of the calculus system
