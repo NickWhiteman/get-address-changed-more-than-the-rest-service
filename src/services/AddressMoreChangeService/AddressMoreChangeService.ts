@@ -12,8 +12,8 @@ export class AddressMoreChangeService implements IAddressMoreChange {
     };
 
     async getAddressMoreChange(): Promise<ResponceAddressMoreChangeService> {
-        let resultWallet: ResponceAddressMoreChangeService;
         const ids: string[] = [];
+        let resultWallet: ResponceAddressMoreChangeService;
         const lastBlock = (await this._blockService.getLastBlock()).result;        
         const startItteration = +this._convertNumber(lastBlock);
 
@@ -48,11 +48,11 @@ export class AddressMoreChangeService implements IAddressMoreChange {
             })
         });
 
-        partiesTransactions.map((parties, index) => {
+        partiesTransactions.map((parties) => {
             Object.keys({
                 from: parties.from, 
                 to: parties.to}).some((key) => {
-                    const indexWalletList = partiesTransactions[index][key] //key wallet 
+                    const indexWalletList = parties[key] //key wallet 
 
                     walletList[indexWalletList] += this._behaviorValueForWalletList(parties['value'])[key]
                 });

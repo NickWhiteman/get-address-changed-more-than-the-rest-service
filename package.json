@@ -5,8 +5,7 @@
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc",
-    "start": "node .",
-    "server:watch": "ts-node-dev --respawn --transpile-only src/index.ts"
+    "start": "node ."
   },
   "author": "Nick Whiteman",
   "license": "ISC",
