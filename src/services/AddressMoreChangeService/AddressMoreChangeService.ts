@@ -36,20 +36,16 @@ export class AddressMoreChangeService implements IAddressMoreChange {
     private _walletFindingLogic(results: BlockType[]) {
         let resultWallet: ResponceAddressMoreChangeService;
         const walletList: {[key: string]: number} = {};
-        const transactions: Transactions[] = [];
         const partiesTransactions: PartiesTransactionsType[] = [];
 
-        results.map((block: BlockType) => {
-            transactions.push(...block.result.transactions
-                .map((transaction: Transactions) => transaction))
-        });
-
-        transactions.map((transaction: Transactions) => {
-            partiesTransactions.push({
-                from: transaction.from,
-                to: transaction.to,
-                value: transaction.value
-            } as PartiesTransactionsType);
+        results.map(({result}: BlockType) => {
+            result.transactions.map((transaction: Transactions) => { 
+                partiesTransactions.push({
+                    from: transaction.from,
+                    to: transaction.to,
+                    value: transaction.value
+                } as PartiesTransactionsType); 
+            })
         });
 
         partiesTransactions.map((parties, index) => {
