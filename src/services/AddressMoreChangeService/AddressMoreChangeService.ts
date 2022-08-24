@@ -35,12 +35,12 @@ export class AddressMoreChangeService implements IAddressMoreChange {
      */
     private _walletFindingLogic(results: BlockType[]) {
         let resultWallet: ResponceAddressMoreChangeService;
-        let partiesTransactions: PartiesTransactionsType[];
-        
-        results.forEach(({result}: BlockType) => {
-            const { transactions } = result;
-            partiesTransactions = this._transactionMapper(transactions);
-        });
+        let partiesTransactions: PartiesTransactionsType[] = [];
+
+        for (let block of results) {
+            const { transactions } = block.result;
+            partiesTransactions.push(...this._transactionMapper(transactions));
+        }
         
         const walletList: WalletListType = this._walletListMapper(partiesTransactions);
 
@@ -51,45 +51,46 @@ export class AddressMoreChangeService implements IAddressMoreChange {
         return resultWallet;
     }
 
-    private _walletListMapper(partiesTransactions: PartiesTransactionsType[]) {
+    private _walletListMapper(partiesTransactions: PartiesTransactionsType[]): WalletListType {
         const walletList: WalletListType = {};
 
         const walletListFiller = (parties: PartiesTransactionsType) => {
-            ['from', 'to'].forEach((key) => {
-                const indexWalletList = parties[key]; 
+            for (let side in ['from', 'to']) {
+                const indexWalletList = parties[side]; 
 
-                walletList[indexWalletList] += this._behaviorValueForWalletList(parties['value'])[key]
-            })
+                walletList[indexWalletList] += this._behaviorValueForWalletList(parties['value'])[side]
+            }
         };
 
-        partiesTransactions.forEach((parties) => {
+        for (let parties of partiesTransactions) {
             walletListFiller(parties);
-        });
+        }
 
         return walletList;
     }
 
     private _findingWallet(walletList: WalletListType): ResponceAddressMoreChangeService {
-        const walletKey = Object.keys(walletList);
         const sortResultValue = Object.values(walletList).sort((a: number, b: number) => b - a);
 
-        const wallet = walletKey.find((wallet) => {
-            walletList[wallet] === sortResultValue[0]
-        });
-
-        return { wallet };
+        for(let wallet in walletList) {
+            if ( walletList[wallet] === sortResultValue[0] ) {
+                return { wallet };
+            }
+        }
     }
 
     private _transactionMapper(transactions: Transactions[]): PartiesTransactionsType[] {
         const partiesTransactions: PartiesTransactionsType[] = [];
 
-        transactions.forEach(transaction => 
+        for (let transaction of transactions) {
+            console.log('transaction', transaction);
+            
             partiesTransactions.push({
                 from: transaction.from,
                 to: transaction.to,
                 value: transaction.value
             })
-        )
+        }
         
         return partiesTransactions;
     }

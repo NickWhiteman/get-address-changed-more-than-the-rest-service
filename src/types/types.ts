@@ -40,7 +40,7 @@ export type Transactions = {
     s: string
 };
 
-type ResultBlockType = {
+export type ResultBlockType = {
     baseFeePerGas: string
     difficulty: string
     extraData: string
