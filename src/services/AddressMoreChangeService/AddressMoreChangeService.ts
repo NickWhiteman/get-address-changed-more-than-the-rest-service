@@ -1,6 +1,11 @@
-import { 
-    BlockType, IAddressMoreChange, PartiesTransactionsType, 
-    ResponceAddressMoreChangeService, Transactions, WalletListType 
+import { parseEther } from "ethers";
+import {
+    BlockType,
+    IAddressMoreChange,
+    PartiesTransactionsType,
+    ResponseAddressMoreChangeService,
+    Transactions,
+    WalletListType,
 } from "src/types/types";
 import { BlockService } from "../BlockService/BlockService";
 
@@ -8,25 +13,34 @@ export class AddressMoreChangeService implements IAddressMoreChange {
     private _blockService: BlockService;
 
     constructor() {
-        this._blockService = new BlockService;
-    };
+        this._blockService = new BlockService();
+    }
 
-    async getAddressMoreChange(): Promise<ResponceAddressMoreChangeService> {
-        const ids: string[] = [];
-        let resultWallet: ResponceAddressMoreChangeService;
-        const lastBlock = (await this._blockService.getLastBlock()).result;        
-        const startItteration = +this._convertNumber(lastBlock);
+    async getAddressMoreChange(): Promise<ResponseAddressMoreChangeService> {
+        try {
+            const ids: string[] = [];
+            let resultWallet: ResponseAddressMoreChangeService;
+            const lastBlock = (await this._blockService.getLastBlock()).result;
+            const startItteration = +lastBlock;
 
-        for (let i = startItteration; i >= startItteration - 100; i--) {
-            const hexStartItteration: string = this._convertNumber(i) as string;
+            for (let i = startItteration; i >= startItteration - 100; i--) {
+                const hexStartItteration: string = this._convertNumber(i) as string;
 
-            ids.push(hexStartItteration);
+                ids.push(hexStartItteration);
+            }
+
+            if (ids.length === 0) {
+                throw new Error("Ids is empty array");
+            }
+
+            const resultMultipleQueries = await this._blockService.getMoreBlockByIds(ids);
+            resultWallet = this._walletFindingLogic(resultMultipleQueries);
+
+            return resultWallet;
+        } catch (error: unknown) {
+            const { message } = error as { message: string };
+            console.error(message);
         }
-
-        const resultMultipleQueries = await this._blockService.getMoreBlockByIds(ids);
-        resultWallet = this._walletFindingLogic(resultMultipleQueries);
-
-        return resultWallet;
     }
 
     /**
@@ -34,17 +48,18 @@ export class AddressMoreChangeService implements IAddressMoreChange {
      * @param {BlockType[]} results array blocks for maping list wallets and finding amount
      */
     private _walletFindingLogic(results: BlockType[]) {
-        let resultWallet: ResponceAddressMoreChangeService;
+        let resultWallet: ResponseAddressMoreChangeService;
         let partiesTransactions: PartiesTransactionsType[] = [];
 
         for (let block of results) {
-            const { transactions } = block.result;
+            const { transactions } =
+                typeof block.result === "string" ? { transactions: [] as Transactions[] } : block.result;
             partiesTransactions.push(...this._transactionMapper(transactions));
         }
-        
+
         const walletList: WalletListType = this._walletListMapper(partiesTransactions);
 
-        if ( walletList ) {
+        if (walletList) {
             resultWallet = this._findingWallet(walletList);
         }
 
@@ -55,25 +70,31 @@ export class AddressMoreChangeService implements IAddressMoreChange {
         const walletList: WalletListType = {};
 
         const walletListFiller = (parties: PartiesTransactionsType) => {
-            for (let side in ['from', 'to']) {
-                const indexWalletList = parties[side]; 
+            for (const side of ["from", "to"]) {
+                const indexWalletList: string = parties[side];
 
-                walletList[indexWalletList] += this._behaviorValueForWalletList(parties['value'])[side]
+                if (!walletList[indexWalletList]) {
+                    walletList[indexWalletList] = 0;
+                }
+
+                const amountTransactions: number = this._behaviorValueForWalletList(parties.value)[side];
+                walletList[indexWalletList] += amountTransactions;
             }
         };
 
-        for (let parties of partiesTransactions) {
+        for (const parties of partiesTransactions) {
             walletListFiller(parties);
         }
 
         return walletList;
     }
 
-    private _findingWallet(walletList: WalletListType): ResponceAddressMoreChangeService {
+    private _findingWallet(walletList: WalletListType): ResponseAddressMoreChangeService {
         const sortResultValue = Object.values(walletList).sort((a: number, b: number) => b - a);
+        console.log("_findingWallet sortResultValue => ", sortResultValue[0]);
 
-        for(let wallet in walletList) {
-            if ( walletList[wallet] === sortResultValue[0] ) {
+        for (const wallet in walletList) {
+            if (walletList[wallet] === sortResultValue[0]) {
                 return { wallet };
             }
         }
@@ -81,22 +102,23 @@ export class AddressMoreChangeService implements IAddressMoreChange {
 
     private _transactionMapper(transactions: Transactions[]): PartiesTransactionsType[] {
         const partiesTransactions: PartiesTransactionsType[] = [];
+        // console.log("_transactionMapper => ", transactions);
 
-        for (let transaction of transactions) {
-            console.log('transaction', transaction);
-            
+        if (!transactions.length) {
+            return partiesTransactions;
+        }
+
+        for (const transaction of transactions) {
             partiesTransactions.push({
                 from: transaction.from,
                 to: transaction.to,
-                value: transaction.value
-            })
+                value: transaction.value,
+            });
         }
-        
+
         return partiesTransactions;
     }
-        
 
-    
     /**
      * @description method converting of the calculus system
      * @param {number} hexNumber type Number @return {string} returning type String and behavior @
@@ -104,20 +126,23 @@ export class AddressMoreChangeService implements IAddressMoreChange {
      * @param {number} deegree parameter of the calculus system. Default deegree = 16
      */
     private _convertNumber(hexNumber: string | number, deegree: number = 16): number | string {
-        if ( typeof hexNumber === 'number' ) {
+        if (typeof hexNumber === "number") {
             return `0x${hexNumber.toString(deegree)}`;
         }
         return parseInt(hexNumber, deegree);
     }
+
     /**
      * @description Bike for operation with amounts
      * @param {string} transactionsValue converting value for walletList
-     * @returns 
+     * @returns
      */
     private _behaviorValueForWalletList(transactionsValue: string) {
-        return {
-            from: -(+this._convertNumber(transactionsValue)),
-            to: +this._convertNumber(transactionsValue)
-        } as {from: number, to: number}
+        const result: { from: number; to: number } = {
+            from: -this._convertNumber(transactionsValue),
+            to: +this._convertNumber(transactionsValue),
+        };
+        // console.log(result);
+        return result;
     }
 }

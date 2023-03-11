@@ -1,12 +1,10 @@
 import PromisePool from "@supercharge/promise-pool/dist";
 import axios from "axios";
-import { env } from 'process';
+import { EvmChain } from "@moralisweb3/common-evm-utils";
+import api from "etherscan-api";
+import { env } from "process";
 
-import { 
-    BlockType, 
-    IBlockService, 
-    LastBlockType, 
-} from "src/types/types";
+import { BlockType, IBlockService, LastBlockType, ResultBlockType, Transactions } from "src/types/types";
 
 export class BlockService implements IBlockService {
     /**
@@ -22,22 +20,21 @@ export class BlockService implements IBlockService {
 
     /**
      * @description method getMoreBlockByIds create list async function
-     * for init array for method Promis.all()
-     * @param {strimg[]} ids array for multiple queries 
-     * @returns {Promise<BlockType[]>} promise of type BlockType[]
+     * for init array for method Promise.all()
+     * @param {string[]} ids array for multiple queries
+     * @returns {Promise<Transactions[]>} promise of type BlockType[]
      */
     async getMoreBlockByIds(ids: string[]): Promise<BlockType[]> {
-        const { results, errors } = await PromisePool
-            .for(ids)
-            .withConcurrency(ids.length)
-            .process((id) => this.getBlockById(id))
+        const results: BlockType[] = [];
+
+        results.push(...(await Promise.all(ids.map((id) => this.getBlockById(id)))));
 
         return results;
     }
 
     /**
      * @description get last block
-     * @returns {Promise<LastBlockType>} proise LastBlockType
+     * @returns {Promise<LastBlockType>} promise LastBlockType
      */
     async getLastBlock(): Promise<LastBlockType> {
         return await this._getRequest<LastBlockType>(
@@ -51,8 +48,13 @@ export class BlockService implements IBlockService {
      * @returns {Promise<LastBlockType | BlockType>} Promise<LastBlockType | BlockType>
      */
     private async _getRequest<T>(url: string): Promise<T> {
-        return await axios.get<T>(url)
-            .then(data => data.data)
-            .catch(err => err );
+        return await axios
+            .get<T>(url)
+            .then((data) => data.data)
+            .catch((err) => err);
+    }
+
+    private async _etherscanApi() {
+        api(env.API_KEY, EvmChain.ETHEREUM, 2000);
     }
 }
