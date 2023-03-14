@@ -15,7 +15,7 @@ export type LastBlockType = {
 };
 
 export type ResponseAddressMoreChangeService = {
-    wallet: string;
+    [key: string]: number;
 };
 
 export type Transactions = {

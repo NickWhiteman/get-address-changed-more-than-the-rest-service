@@ -91,13 +91,74 @@ export class AddressMoreChangeService implements IAddressMoreChange {
 
     private _findingWallet(walletList: WalletListType): ResponseAddressMoreChangeService {
         const sortResultValue = Object.values(walletList).sort((a: number, b: number) => b - a);
-        console.log("_findingWallet sortResultValue => ", sortResultValue[0]);
-
+        const result: ResponseAddressMoreChangeService = {};
         for (const wallet in walletList) {
-            if (walletList[wallet] === sortResultValue[0]) {
-                return { wallet };
-            }
+            //TODO: need to correctly find the indices of a sorted array
+            if (
+                walletList[wallet] === sortResultValue[0] ||
+                walletList[wallet] === sortResultValue[1] ||
+                walletList[wallet] === sortResultValue[2] ||
+                walletList[wallet] === sortResultValue[3] ||
+                walletList[wallet] === sortResultValue[4] ||
+                walletList[wallet] === sortResultValue[5] ||
+                walletList[wallet] === sortResultValue[6] ||
+                walletList[wallet] === sortResultValue[7] ||
+                walletList[wallet] === sortResultValue[8] ||
+                walletList[wallet] === sortResultValue[9] ||
+                walletList[wallet] === sortResultValue[10] ||
+                walletList[wallet] === sortResultValue[11] ||
+                walletList[wallet] === sortResultValue[12] ||
+                walletList[wallet] === sortResultValue[13] ||
+                walletList[wallet] === sortResultValue[14] ||
+                walletList[wallet] === sortResultValue[15] ||
+                walletList[wallet] === sortResultValue[16] ||
+                walletList[wallet] === sortResultValue[17] ||
+                walletList[wallet] === sortResultValue[18] ||
+                walletList[wallet] === sortResultValue[19] ||
+                walletList[wallet] === sortResultValue[20] ||
+                walletList[wallet] === sortResultValue[21] ||
+                walletList[wallet] === sortResultValue[22] ||
+                walletList[wallet] === sortResultValue[23] ||
+                walletList[wallet] === sortResultValue[24] ||
+                walletList[wallet] === sortResultValue[25] ||
+                walletList[wallet] === sortResultValue[26] ||
+                walletList[wallet] === sortResultValue[27] ||
+                walletList[wallet] === sortResultValue[28] ||
+                walletList[wallet] === sortResultValue[29]
+            )
+                result[wallet] =
+                    (walletList[wallet] === sortResultValue[0] && sortResultValue[0]) ||
+                    (walletList[wallet] === sortResultValue[1] && sortResultValue[1]) ||
+                    (walletList[wallet] === sortResultValue[2] && sortResultValue[2]) ||
+                    (walletList[wallet] === sortResultValue[3] && sortResultValue[3]) ||
+                    (walletList[wallet] === sortResultValue[4] && sortResultValue[4]) ||
+                    (walletList[wallet] === sortResultValue[5] && sortResultValue[5]) ||
+                    (walletList[wallet] === sortResultValue[6] && sortResultValue[6]) ||
+                    (walletList[wallet] === sortResultValue[7] && sortResultValue[7]) ||
+                    (walletList[wallet] === sortResultValue[8] && sortResultValue[8]) ||
+                    (walletList[wallet] === sortResultValue[9] && sortResultValue[9]) ||
+                    (walletList[wallet] === sortResultValue[10] && sortResultValue[10]) ||
+                    (walletList[wallet] === sortResultValue[11] && sortResultValue[11]) ||
+                    (walletList[wallet] === sortResultValue[12] && sortResultValue[12]) ||
+                    (walletList[wallet] === sortResultValue[13] && sortResultValue[13]) ||
+                    (walletList[wallet] === sortResultValue[14] && sortResultValue[14]) ||
+                    (walletList[wallet] === sortResultValue[15] && sortResultValue[15]) ||
+                    (walletList[wallet] === sortResultValue[16] && sortResultValue[16]) ||
+                    (walletList[wallet] === sortResultValue[17] && sortResultValue[17]) ||
+                    (walletList[wallet] === sortResultValue[18] && sortResultValue[18]) ||
+                    (walletList[wallet] === sortResultValue[19] && sortResultValue[19]) ||
+                    (walletList[wallet] === sortResultValue[20] && sortResultValue[20]) ||
+                    (walletList[wallet] === sortResultValue[21] && sortResultValue[21]) ||
+                    (walletList[wallet] === sortResultValue[22] && sortResultValue[22]) ||
+                    (walletList[wallet] === sortResultValue[23] && sortResultValue[23]) ||
+                    (walletList[wallet] === sortResultValue[24] && sortResultValue[24]) ||
+                    (walletList[wallet] === sortResultValue[25] && sortResultValue[25]) ||
+                    (walletList[wallet] === sortResultValue[26] && sortResultValue[26]) ||
+                    (walletList[wallet] === sortResultValue[27] && sortResultValue[27]) ||
+                    (walletList[wallet] === sortResultValue[28] && sortResultValue[28]) ||
+                    (walletList[wallet] === sortResultValue[29] && sortResultValue[29]);
         }
+        return result;
     }
 
     private _transactionMapper(transactions: Transactions[]): PartiesTransactionsType[] {

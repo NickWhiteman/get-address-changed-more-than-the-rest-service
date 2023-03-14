@@ -21,7 +21,22 @@ app.get("/", async (req, res) => {
         res.send(wallet);
     } catch (error: unknown) {
         const { message } = error as { message: string };
-        res.send({ message, port, moralis: MORALIS_API_KEY, etherscan: env.API_KEY });
+        console.error(message);
+    }
+});
+
+app.get("/isToken", async (req, res) => {
+    try {
+        const address = new AddressMoreChangeService();
+        const wallets = await address.getAddressMoreChange();
+        const response = await Moralis.EvmApi.token.getTokenMetadata({
+            addresses: Object.keys(wallets),
+            chain: EvmChain.ETHEREUM,
+        });
+        res.send(response);
+    } catch (error: unknown) {
+        const { message } = error as { message: string };
+        console.error(message);
     }
 });
 
